@@ -110,6 +110,27 @@ func UpdateMan(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
+func DeleteMan(c *gin.Context) {
+	id, err := util.ParseUint(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
+	if err := common.GetDB().Delete(&model.GreatMan{}, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
 type Man struct {
 	HeadImgUrl *string   `json:"headImgUrl" binding:"required"`
 	ManInfos   []ManInfo `json:"manInfos" binding:"required"`

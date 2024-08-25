@@ -27,7 +27,7 @@ func main() {
 
 		v0.POST("/man", controllers.CreatNewMan).Use(auth)
 		v0.PUT("/man/:id", controllers.UpdateMan).Use(auth)
-		v0.DELETE("/man/:id").Use(auth)
+		v0.DELETE("/man/:id", controllers.DeleteMan).Use(auth)
 
 		v0.POST("/man/:id/talk").Use(auth)
 
