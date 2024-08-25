@@ -37,7 +37,7 @@ func main() {
 		v0Auth.POST("/man/:id/talk", controllers.NewTalk)
 
 		v0Auth.PUT("/talk/:id", controllers.UpdateTalk)
-		v0Auth.DELETE("/talk/:id")
+		v0Auth.DELETE("/talk/:id", controllers.DeleteTalk)
 	}
 
 	_ = r.Run("localhost:" + os.Getenv("PORT"))

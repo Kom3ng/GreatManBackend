@@ -34,6 +34,11 @@ func GetGreatMan(c *gin.Context) {
 		return
 	}
 
+	if len(greatMan.GreatManInfos) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"name":       greatMan.GreatManInfos[0].Name,
 		"comment":    greatMan.GreatManInfos[0].Comment,

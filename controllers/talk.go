@@ -185,6 +185,26 @@ func UpdateTalk(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
+func DeleteTalk(c *gin.Context) {
+	id, err := util.ParseUint(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
+	if err := common.GetDB().Delete(&model.TalkRecord{}, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
 func convertToModel(talk *Talk) model.TalkRecord {
 	var tcs []model.TalkContent
 	var as []model.Attachment
