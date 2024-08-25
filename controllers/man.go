@@ -59,15 +59,19 @@ func CreatNewMan(c *gin.Context) {
 		})
 	}
 
-	if err := common.GetDB().Create(&model.GreatMan{
+	g := model.GreatMan{
 		HeadImgUrl:    man.HeadImgUrl,
 		GreatManInfos: infos,
-	}).Error; err != nil {
+	}
+
+	if err := common.GetDB().Create(&g).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, gin.H{
+		"id": g.ID,
+	})
 }
 
 func UpdateMan(c *gin.Context) {
