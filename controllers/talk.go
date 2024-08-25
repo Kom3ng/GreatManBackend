@@ -12,32 +12,27 @@ import (
 )
 
 func GetTalks(c *gin.Context) {
-	greatManId, err1 := util.ParseUint(c.Param("id"))
+	var s SearchParam
+	greatManId, err := util.ParseUint(c.Param("id"))
 	lang := c.Query("lang")
-	limit, err2 := util.ParseUint(c.Query("limit"))
-	page, err3 := util.ParseUint(c.Query("page"))
 	talkType := c.Query("type")
 
-	if err1 != nil || err2 != nil || err3 != nil {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{})
 		return
 	}
 
-	if limit >= 20 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "limit too large",
-		})
+	if err := c.ShouldBind(&s); err != nil || s.Limit > 20 {
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
-
-	skip := limit * page
 
 	var talkRecords []model.TalkRecord
 
 	if err := common.GetDB().
 		Order("created_at DESC").
-		Limit(int(limit)).
-		Offset(int(skip)).
+		Limit(int(s.Limit)).
+		Offset(int(s.Limit * s.Page)).
 		Select("ID").
 		Where(&model.TalkRecord{
 			GreatManId: greatManId,
