@@ -173,7 +173,7 @@ func GetGreatMen(c *gin.Context) {
 }
 
 type Man struct {
-	HeadImgUrl *string   `json:"headImgUrl" binding:"required"`
+	HeadImgUrl *string   `json:"headImgUrl"`
 	ManInfos   []ManInfo `json:"manInfos" binding:"required"`
 }
 

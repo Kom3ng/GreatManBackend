@@ -234,27 +234,24 @@ func convertToModel(talk *Talk) model.TalkRecord {
 }
 
 type Talk struct {
-	Type         string `json:"type"`
+	Type         string `json:"type" binding:"required"`
 	TalkContents []struct {
-		Language    string  `json:"language"`
-		Title       string  `json:"title"`
-		MainBody    string  `json:"mainBody"`
+		Language    string  `json:"language" binding:"required"`
+		Title       string  `json:"title" binding:"required"`
+		MainBody    string  `json:"mainBody" binding:"required"`
 		Interviewer *string `json:"interviewer"`
 		Source      *string `json:"source"`
 	} `json:"talkContents"`
-	Attachments []struct {
-		Type  string `json:"type"`
-		Value string `json:"value"`
-	} `json:"attachments"`
+	Attachments []AttachmentData `json:"attachments"`
 }
 
 type AttachmentData struct {
-	Type  string `json:"type"`
-	Value string `json:"value"`
+	Type  string `json:"type" binding:"required"`
+	Value string `json:"value" binding:"required"`
 }
 
 type SimpleTalkInfo struct {
-	TalkRecordId uint      `json:"id"`
-	Title        string    `json:"title"`
-	CreatedAt    time.Time `json:"date"`
+	TalkRecordId uint      `json:"id" binding:"required"`
+	Title        string    `json:"title" binding:"required"`
+	CreatedAt    time.Time `json:"date" binding:"required"`
 }
