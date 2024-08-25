@@ -25,6 +25,7 @@ func main() {
 
 	v0Auth.Use(auth)
 	{
+		v0.GET("/men", controllers.GetGreatMen)
 		v0.GET("/man/:id", controllers.GetGreatMan)
 		v0.GET("/man/:id/talks", controllers.GetTalks)
 		v0.GET("/talk/:id/content", controllers.GetTalkDetail)

@@ -69,9 +69,7 @@ func CreatNewMan(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"id": g.ID,
-	})
+	c.JSON(http.StatusOK, g.ID)
 }
 
 func UpdateMan(c *gin.Context) {
@@ -142,6 +140,33 @@ func DeleteMan(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
+func GetGreatMen(c *gin.Context) {
+	var s SearchParam
+	var men []model.GreatMan
+	var results []uint
+
+	if err := c.ShouldBind(&s); err != nil || s.Limit > 20 {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	if err := common.
+		GetDB().
+		Order("created_at DESC").
+		Limit(int(s.Limit)).
+		Offset(int(s.Limit * s.Page)).
+		Find(&men).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	for _, m := range men {
+		results = append(results, m.ID)
+	}
+
+	c.JSON(http.StatusOK, results)
+}
+
 type Man struct {
 	HeadImgUrl *string   `json:"headImgUrl" binding:"required"`
 	ManInfos   []ManInfo `json:"manInfos" binding:"required"`
@@ -151,4 +176,9 @@ type ManInfo struct {
 	Language string  `json:"language" binding:"required"`
 	Name     string  `json:"name" binding:"required"`
 	Comment  *string `json:"comment"`
+}
+
+type SearchParam struct {
+	Limit uint `form:"limit"`
+	Page  uint `form:"page"`
 }
