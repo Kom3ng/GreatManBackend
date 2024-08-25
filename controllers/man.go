@@ -59,7 +59,7 @@ func CreatNewMan(c *gin.Context) {
 		})
 	}
 
-	if err := common.GetDB().Create(model.GreatMan{
+	if err := common.GetDB().Create(&model.GreatMan{
 		HeadImgUrl:    man.HeadImgUrl,
 		GreatManInfos: infos,
 	}).Error; err != nil {
@@ -96,13 +96,20 @@ func UpdateMan(c *gin.Context) {
 
 	if err := common.
 		GetDB().
-		Session(&gorm.Session{FullSaveAssociations: true}).
-		Where("id = ?", id).
 		Omit("TalkRecords").
-		Save(model.GreatMan{
+		Session(&gorm.Session{FullSaveAssociations: true}).
+		Updates(&model.GreatMan{
+			Model: gorm.Model{
+				ID: id,
+			},
 			HeadImgUrl:    man.HeadImgUrl,
 			GreatManInfos: infos,
 		}).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}

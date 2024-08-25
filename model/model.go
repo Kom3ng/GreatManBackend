@@ -1,6 +1,10 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"database/sql"
+	"gorm.io/gorm"
+	"time"
+)
 
 type LanguageCode string
 type AttachmentType string
@@ -19,11 +23,13 @@ type GreatMan struct {
 }
 
 type GreatManInfo struct {
-	gorm.Model
-	GreatManId uint   `gorm:"unique_index:idx_d,priority:2"`
-	Language   string `gorm:"unique_index:idx_d,priority:1"`
+	GreatManId uint   `gorm:"primaryKey;autoIncrement:false"`
+	Language   string `gorm:"primaryKey"`
 	Name       string
 	Comment    *string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  sql.NullTime `gorm:"index"`
 }
 
 type TalkRecord struct {
@@ -35,13 +41,15 @@ type TalkRecord struct {
 }
 
 type TalkContent struct {
-	gorm.Model
-	TalkRecordId uint   `gorm:"unique_index:idx_c,priority:2"`
-	Language     string `gorm:"unique_index:idx_c,priority:1"`
+	TalkRecordId uint   `gorm:"primaryKey;autoIncrement:false"`
+	Language     string `gorm:"primaryKey"`
 	Title        string
 	MainBody     string
 	Interviewer  *string
 	Source       *string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    sql.NullTime `gorm:"index"`
 }
 
 type Attachment struct {
