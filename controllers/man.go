@@ -40,3 +40,43 @@ func GetGreatMan(c *gin.Context) {
 		"headImgUrl": greatMan.HeadImgUrl,
 	})
 }
+
+func CreatNewMan(c *gin.Context) {
+	man := Man{}
+
+	if err := c.ShouldBind(&man); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
+	var infos []model.GreatManInfo
+
+	for _, i := range man.ManInfos {
+		infos = append(infos, model.GreatManInfo{
+			Language: i.Language,
+			Comment:  i.Comment,
+			Name:     i.Name,
+		})
+	}
+
+	if err := common.GetDB().Create(model.GreatMan{
+		HeadImgUrl:    man.HeadImgUrl,
+		GreatManInfos: infos,
+	}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+type Man struct {
+	HeadImgUrl *string   `json:"headImgUrl" binding:"required"`
+	ManInfos   []ManInfo `json:"manInfos" binding:"required"`
+}
+
+type ManInfo struct {
+	Language string  `json:"language" binding:"required"`
+	Name     string  `json:"name" binding:"required"`
+	Comment  *string `json:"comment"`
+}

@@ -28,7 +28,7 @@ func main() {
 		v0.GET("/man/:id/talks", controllers.GetTalks)
 		v0.GET("/talk/:id/content", controllers.GetTalkDetail)
 
-		v0.POST("/man/:id").Use(auth)
+		v0.POST("/man/:id", controllers.CreatNewMan).Use(auth)
 		v0.PUT("/man/:id").Use(auth)
 		v0.DELETE("/man/:id").Use(auth)
 
