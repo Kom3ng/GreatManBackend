@@ -116,6 +116,118 @@ func GetTalkDetail(c *gin.Context) {
 	})
 }
 
+func NewTalk(c *gin.Context) {
+	var talk Talk
+	id, err := util.ParseUint(c.Param("id"))
+
+	if err := c.ShouldBind(&talk); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
+	r := convertToModel(&talk)
+
+	if err := common.
+		GetDB().
+		Model(&model.GreatMan{
+			Model: gorm.Model{
+				ID: id,
+			},
+		}).
+		Session(&gorm.Session{FullSaveAssociations: true}).
+		Association("TalkRecords").
+		Append(&r); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, r.ID)
+}
+
+func UpdateTalk(c *gin.Context) {
+	var talk Talk
+	id, err := util.ParseUint(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
+	if err := c.ShouldBind(&talk); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{})
+		return
+	}
+
+	t := convertToModel(&talk)
+	t.ID = id
+	if err := common.
+		GetDB().
+		Session(&gorm.Session{FullSaveAssociations: true}).
+		Updates(&t).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+func convertToModel(talk *Talk) model.TalkRecord {
+	var tcs []model.TalkContent
+	var as []model.Attachment
+
+	for _, t := range talk.TalkContents {
+		tcs = append(tcs, model.TalkContent{
+			Language:    t.Language,
+			MainBody:    t.MainBody,
+			Title:       t.Title,
+			Interviewer: t.Interviewer,
+			Source:      t.Source,
+		})
+	}
+
+	for _, a := range talk.Attachments {
+		as = append(as, model.Attachment{
+			Type:  model.AttachmentType(a.Type),
+			Value: a.Value,
+		})
+	}
+
+	return model.TalkRecord{
+		Type:         talk.Type,
+		TalkContents: tcs,
+		Attachments:  as,
+	}
+}
+
+type Talk struct {
+	Type         string `json:"type"`
+	TalkContents []struct {
+		Language    string  `json:"language"`
+		Title       string  `json:"title"`
+		MainBody    string  `json:"mainBody"`
+		Interviewer *string `json:"interviewer"`
+		Source      *string `json:"source"`
+	} `json:"talkContents"`
+	Attachments []struct {
+		Type  string `json:"type"`
+		Value string `json:"value"`
+	} `json:"attachments"`
+}
+
 type AttachmentData struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`

@@ -34,9 +34,9 @@ func main() {
 		v0Auth.PUT("/man/:id", controllers.UpdateMan)
 		v0Auth.DELETE("/man/:id", controllers.DeleteMan)
 
-		v0Auth.POST("/man/:id/talk")
+		v0Auth.POST("/man/:id/talk", controllers.NewTalk)
 
-		v0Auth.PUT("/talk/:id")
+		v0Auth.PUT("/talk/:id", controllers.UpdateTalk)
 		v0Auth.DELETE("/talk/:id")
 	}
 
