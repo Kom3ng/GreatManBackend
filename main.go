@@ -2,13 +2,10 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"greatmanbackend/common"
 	"greatmanbackend/controllers"
 	"os"
 )
-
-var db *gorm.DB
 
 func main() {
 	common.InitDB()
@@ -28,8 +25,8 @@ func main() {
 		v0.GET("/man/:id/talks", controllers.GetTalks)
 		v0.GET("/talk/:id/content", controllers.GetTalkDetail)
 
-		v0.POST("/man/:id", controllers.CreatNewMan).Use(auth)
-		v0.PUT("/man/:id").Use(auth)
+		v0.POST("/man", controllers.CreatNewMan).Use(auth)
+		v0.PUT("/man/:id", controllers.UpdateMan).Use(auth)
 		v0.DELETE("/man/:id").Use(auth)
 
 		v0.POST("/man/:id/talk").Use(auth)

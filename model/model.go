@@ -15,13 +15,13 @@ type GreatMan struct {
 	gorm.Model
 	HeadImgUrl    *string
 	GreatManInfos []GreatManInfo `gorm:"foreignKey:GreatManId"`
-	TalkRecord    []TalkRecord   `gorm:"foreignKey:GreatManId"`
+	TalkRecords   []TalkRecord   `gorm:"foreignKey:GreatManId"`
 }
 
 type GreatManInfo struct {
 	gorm.Model
-	GreatManId uint   `gorm:"index:idx_d,priority:2"`
-	Language   string `gorm:"index:idx_d,priority:1"`
+	GreatManId uint   `gorm:"unique_index:idx_d,priority:2"`
+	Language   string `gorm:"unique_index:idx_d,priority:1"`
 	Name       string
 	Comment    *string
 }
@@ -36,8 +36,8 @@ type TalkRecord struct {
 
 type TalkContent struct {
 	gorm.Model
-	TalkRecordId uint   `gorm:"index:idx_c,priority:2"`
-	Language     string `gorm:"index:idx_c,priority:1"`
+	TalkRecordId uint   `gorm:"unique_index:idx_c,priority:2"`
+	Language     string `gorm:"unique_index:idx_c,priority:1"`
 	Title        string
 	MainBody     string
 	Interviewer  *string
