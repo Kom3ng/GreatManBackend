@@ -106,6 +106,12 @@ func GetTalkDetail(c *gin.Context) {
 		})
 	}
 
+	if len(talk.TalkContents) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{})
+
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"title":       talk.TalkContents[0].Title,
 		"content":     talk.TalkContents[0].MainBody,
