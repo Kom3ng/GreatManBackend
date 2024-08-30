@@ -48,6 +48,11 @@ func GetTalks(c *gin.Context) {
 		return
 	}
 
+	if len(talkRecords) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{})
+		return
+	}
+
 	var ids []uint
 	for _, r := range talkRecords {
 		ids = append(ids, r.ID)
@@ -57,10 +62,8 @@ func GetTalks(c *gin.Context) {
 
 	if err := common.GetDB().
 		Model(&model.TalkContent{}).
-		Where(&model.TalkContent{
-			Language: lang,
-		}).
-		Find(&talkInfos, ids).Error; err != nil {
+		Where("talk_record_id IN (?) AND language = ?", ids, lang).
+		Find(&talkInfos).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{})
 			return
@@ -175,9 +178,13 @@ func UpdateTalk(c *gin.Context) {
 	}
 
 	t := convertToModel(&talk)
-	t.ID = id
 	if err := common.
 		GetDB().
+		Where(&model.TalkRecord{
+			Model: gorm.Model{
+				ID: id,
+			},
+		}).
 		Session(&gorm.Session{FullSaveAssociations: true}).
 		Updates(&t).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
